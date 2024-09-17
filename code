@@ -1,0 +1,58 @@
+import tkinter as tk  # Import tkinter for GUI
+import RPi.GPIO as GPIO  # Import GPIO for controlling Raspberry Pi pins
+
+# Setup GPIO mode and define pin numbers for the LEDs
+GPIO.setmode(GPIO.BCM)
+red_led = 17
+green_led = 27
+blue_led = 22
+
+# Configure the pins as outputs
+GPIO.setup(red_led, GPIO.OUT)
+GPIO.setup(green_led, GPIO.OUT)
+GPIO.setup(blue_led, GPIO.OUT)
+
+# Turn off all LEDs initially
+GPIO.output(red_led, GPIO.LOW)
+GPIO.output(green_led, GPIO.LOW)
+GPIO.output(blue_led, GPIO.LOW)
+
+# Function to control which LED is on based on user selection
+def select_led():
+    selected_led = led_choice.get()  # Get selected LED from radio buttons
+    if selected_led == 'red':
+        GPIO.output(red_led, GPIO.HIGH)   # Turn on red LED
+        GPIO.output(green_led, GPIO.LOW)  # Turn off green and blue LEDs
+        GPIO.output(blue_led, GPIO.LOW)
+    elif selected_led == 'green':
+        GPIO.output(red_led, GPIO.LOW)
+        GPIO.output(green_led, GPIO.HIGH)  # Turn on green LED
+        GPIO.output(blue_led, GPIO.LOW)
+    elif selected_led == 'blue':
+        GPIO.output(red_led, GPIO.LOW)
+        GPIO.output(green_led, GPIO.LOW)
+        GPIO.output(blue_led, GPIO.HIGH)  # Turn on blue LED
+
+# Function to clean up GPIO and close the GUI window
+def exit_gui():
+    GPIO.cleanup()  # Reset GPIO settings
+    root.destroy()  # Close the GUI window
+
+# Create the main window for the GUI
+root = tk.Tk()
+root.title("LED Controller")
+
+# Create a StringVar to hold the selected LED option
+led_choice = tk.StringVar(value="red")  # Default is red
+
+# Add radio buttons for selecting the LED color
+tk.Radiobutton(root, text="Red", variable=led_choice, value="red", command=select_led).pack(anchor=tk.W)
+tk.Radiobutton(root, text="Green", variable=led_choice, value="green", command=select_led).pack(anchor=tk.W)
+tk.Radiobutton(root, text="Blue", variable=led_choice, value="blue", command=select_led).pack(anchor=tk.W)
+
+# Add an exit button to safely close the program
+exit_button = tk.Button(root, text="Exit", command=exit_gui)
+exit_button.pack()
+
+# Start the Tkinter event loop to keep the window open
+root.mainloop()
